@@ -24,7 +24,7 @@ def login():
 
     cursor = conn.cursor(dictionary=True)
 
-    # 1. Direct SQL Query: Validate User credentials
+    #Validate User credentials
     query = "SELECT * FROM User WHERE Email = %s AND Password = %s"
     cursor.execute(query, (email, password))
     user = cursor.fetchone()
@@ -37,7 +37,7 @@ def login():
     user_id = user["User_ID"]
     role = None
 
-    # 2. Direct SQL Query: Check User Subclass Role (Admin, Doctor, or Patient)
+    #Check User Subclass Role (Admin, Doctor, or Patient)
     cursor.execute("SELECT * FROM Admin WHERE Admin_ID = %s", (user_id,))
     if cursor.fetchone():
         role = "Admin"
@@ -83,12 +83,12 @@ def signup():
         if cursor.fetchone():
             return render_template("signup.html", error="Email is already registered.")
 
-        # 1. Direct SQL: Insert base User record
+        #Insert base User record
         insert_user_query = "INSERT INTO User (Name, Email, Password, Phone) VALUES (%s, %s, %s, %s)"
         cursor.execute(insert_user_query, (name, email, password, phone))
         user_id = cursor.lastrowid
 
-        # 2. Direct SQL: Insert into specific subclass table
+        # Insert into specific subclass table
         if role == "Admin":
             cursor.execute("INSERT INTO Admin (Admin_ID) VALUES (%s)", (user_id,))
         elif role == "Doctor":
@@ -123,7 +123,7 @@ def dashboard():
 
     cursor = conn.cursor(dictionary=True)
 
-    # Direct SQL: Fetch full profile joining base User with role subclass
+    #Fetch full profile joining base User with role subclass
     if role == "Doctor":
         query = """
             SELECT u.User_ID, u.Name, u.Email, u.Phone, d.Specialization 
