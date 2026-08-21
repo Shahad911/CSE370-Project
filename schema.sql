@@ -1,8 +1,7 @@
--- Database Creation
 CREATE DATABASE IF NOT EXISTS hospital_db;
 USE hospital_db;
 
--- 1. Base User Table
+--Base User Table
 CREATE TABLE IF NOT EXISTS User (
     User_ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
@@ -11,7 +10,7 @@ CREATE TABLE IF NOT EXISTS User (
     Phone VARCHAR(20) NOT NULL
 );
 
--- 2. Role Subclasses (Specialization)
+--Role Subclasses (Specialization)
 CREATE TABLE IF NOT EXISTS Admin (
     Admin_ID INT PRIMARY KEY,
     FOREIGN KEY (Admin_ID) REFERENCES User(User_ID) ON DELETE CASCADE
@@ -30,7 +29,7 @@ CREATE TABLE IF NOT EXISTS Patient (
     FOREIGN KEY (Patient_ID) REFERENCES User(User_ID) ON DELETE CASCADE
 );
 
--- 3. Duty Schedules
+--Duty Schedules
 CREATE TABLE IF NOT EXISTS Schedule (
     Schedule_ID INT AUTO_INCREMENT PRIMARY KEY,
     Day VARCHAR(20) NOT NULL,
@@ -42,7 +41,7 @@ CREATE TABLE IF NOT EXISTS Schedule (
     FOREIGN KEY (Doctor_ID) REFERENCES Doctor(Doctor_ID)
 );
 
--- 4. Appointments
+--Appointments
 CREATE TABLE IF NOT EXISTS Appointment (
     Appointment_ID INT AUTO_INCREMENT PRIMARY KEY,
     Date DATE NOT NULL,
@@ -56,7 +55,7 @@ CREATE TABLE IF NOT EXISTS Appointment (
     FOREIGN KEY (Schedule_ID) REFERENCES Schedule(Schedule_ID)
 );
 
--- 5. Medical History
+--Medical History
 CREATE TABLE IF NOT EXISTS Medical_History (
     Record_ID INT AUTO_INCREMENT PRIMARY KEY,
     Diagnosis TEXT NOT NULL,
@@ -68,7 +67,7 @@ CREATE TABLE IF NOT EXISTS Medical_History (
     FOREIGN KEY (Doctor_ID) REFERENCES Doctor(Doctor_ID)
 );
 
--- 6. Invoices & Billing
+--Invoices & Billing
 CREATE TABLE IF NOT EXISTS Bill (
     Bill_ID INT AUTO_INCREMENT PRIMARY KEY,
     Bill_Date DATE NOT NULL,
@@ -77,7 +76,7 @@ CREATE TABLE IF NOT EXISTS Bill (
     FOREIGN KEY (Appointment_ID) REFERENCES Appointment(Appointment_ID) ON DELETE CASCADE
 );
 
--- 7. Lab Tests
+--Lab Tests
 CREATE TABLE IF NOT EXISTS Lab_Test (
     Test_ID INT AUTO_INCREMENT PRIMARY KEY,
     Test_Name VARCHAR(100) NOT NULL,
@@ -92,7 +91,7 @@ CREATE TABLE IF NOT EXISTS Lab_Test (
     FOREIGN KEY (Bill_ID) REFERENCES Bill(Bill_ID) ON DELETE SET NULL
 );
 
--- 8. Prescriptions
+--Prescriptions
 CREATE TABLE IF NOT EXISTS Prescription (
     Prescription_ID INT AUTO_INCREMENT PRIMARY KEY,
     Date DATE NOT NULL,
@@ -100,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Prescription (
     FOREIGN KEY (Appointment_ID) REFERENCES Appointment(Appointment_ID) ON DELETE CASCADE
 );
 
--- 9. Medicines Inventory
+--Medicines Inventory
 CREATE TABLE IF NOT EXISTS Medicine (
     Medicine_ID INT AUTO_INCREMENT PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
@@ -108,7 +107,7 @@ CREATE TABLE IF NOT EXISTS Medicine (
     Stock INT NOT NULL DEFAULT 0
 );
 
--- 10. Prescription-Medicine Bridge Table (M:N)
+--Prescription-Medicine Bridge Table (M:N)
 CREATE TABLE IF NOT EXISTS Prescription_Medicine (
     Prescription_ID INT NOT NULL,
     Medicine_ID INT NOT NULL,
@@ -119,7 +118,7 @@ CREATE TABLE IF NOT EXISTS Prescription_Medicine (
     FOREIGN KEY (Medicine_ID) REFERENCES Medicine(Medicine_ID)
 );
 
--- 11. Payments
+--Payments
 CREATE TABLE IF NOT EXISTS Payment (
     Payment_ID INT AUTO_INCREMENT PRIMARY KEY,
     Amount DECIMAL(10, 2) NOT NULL,
