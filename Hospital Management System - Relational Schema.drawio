@@ -1,0 +1,144 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0">
+  <diagram name="Hospital Management System - Relational Schema" id="hms-relational-schema">
+    <mxGraphModel dx="1407" dy="758" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1600" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="t_user" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#5b6770;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#5b6770; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;User&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;User_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Name&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Email&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Password&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Phone&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="150" width="220" x="900" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="t_admin" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#4a7bb0;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#4a7bb0; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Admin&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Admin_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK, FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="70" width="200" x="250" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="t_doctor" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#449d44;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#449d44; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Doctor&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Doctor_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK, FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Specialization&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="95" width="220" x="900" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="t_patient" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#c9302c;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#c9302c; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Patient&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Patient_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK, FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;DOB&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Gender&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="115" width="220" x="1550" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_admin_user" edge="1" parent="1" source="t_admin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#4a7bb0;strokeWidth=1.5;" target="t_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_doc_user" edge="1" parent="1" source="t_doctor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#449d44;strokeWidth=1.5;" target="t_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_pat_user" edge="1" parent="1" source="t_patient" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#c9302c;strokeWidth=1.5;" target="t_user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="t_schedule" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#ec971f;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#ec971f; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Schedule&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Schedule_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Day&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Start_Time&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;End_Time&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Admin_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Doctor_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="175" width="240" x="250" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="t_appointment" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#ec971f;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#ec971f; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Appointment&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Appointment_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Date&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Time&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Status&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Patient_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Doctor_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Schedule_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="200" width="240" x="890" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="t_lab_test" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#31b0d5;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#31b0d5; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Lab_Test&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Test_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Test_Name&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Test_Cost&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Status&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Result&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Patient_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Doctor_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Bill_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="220" width="230" x="1550" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_sch_admin" edge="1" parent="1" source="t_schedule" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_admin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_sch_doc" edge="1" parent="1" source="t_schedule" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;strokeColor=#888888;" target="t_doctor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_app_doc" edge="1" parent="1" source="t_appointment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_doctor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_app_pat" edge="1" parent="1" source="t_appointment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;strokeColor=#888888;" target="t_patient">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1340" y="540" />
+              <mxPoint x="1340" y="346.27" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_app_sch" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="890" y="573.4499999999999" as="sourcePoint" />
+            <mxPoint x="490" y="560.9954545454545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_lt_pat" edge="1" parent="1" source="t_lab_test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_patient">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_lt_doc" edge="1" parent="1" source="t_lab_test" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;strokeColor=#888888;" target="t_doctor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1450" y="470" />
+              <mxPoint x="1450" y="331" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="t_history" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#ec971f;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#ec971f; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Medical_History&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Record_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Diagnosis&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Treatment&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Date&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Patient_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Doctor_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="175" width="240" x="250" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="t_prescription" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#ec971f;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#ec971f; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Prescription&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Prescription_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Date&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Appointment_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK, UQ&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="115" width="230" x="620" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="t_pm" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#9b59b6;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#9b59b6; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Prescription_Medicine&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Prescription_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK, FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Medicine_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK, FK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Dosage&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Frequency&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="135" width="250" x="1050" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="t_medicine" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#449d44;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#449d44; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Medicine&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Medicine_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Name&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Price&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Stock&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="135" width="220" x="1550" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_his_pat" edge="1" parent="1" source="t_history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;strokeColor=#888888;" target="t_patient">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="180" y="818" />
+              <mxPoint x="180" y="400" />
+              <mxPoint x="1605" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_his_doc" edge="1" parent="1" source="t_history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=1;entryDx=0;entryDy=0;strokeColor=#888888;" target="t_doctor">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="200" y="850" />
+              <mxPoint x="200" y="420" />
+              <mxPoint x="955" y="420" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_pr_app" edge="1" parent="1" source="t_prescription" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_appointment">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_pm_pr" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9b59b6;strokeWidth=1.5;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1050" y="812.9954545454545" as="sourcePoint" />
+            <mxPoint x="850" y="802.9954545454545" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_pm_med" edge="1" parent="1" source="t_pm" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#9b59b6;strokeWidth=1.5;" target="t_medicine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="t_bill" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#ec971f;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#ec971f; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Bill&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Bill_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Bill_Date&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Total_Amount&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#777; font-style:italic; text-align:right;&quot;&gt;Computed&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Appointment_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK, UQ&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="135" width="240" x="890" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="t_payment" parent="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#449d44;strokeWidth=2;" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:Helvetica; font-size:11px;&quot;&gt;&lt;tr style=&quot;background:#449d44; color:#ffffff; font-weight:bold; font-size:13px; text-align:center;&quot;&gt;&lt;td colspan=&quot;2&quot; style=&quot;padding:6px;&quot;&gt;Payment&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px; font-weight:bold;&quot;&gt;&lt;u&gt;Payment_ID&lt;/u&gt;&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#d9534f; font-weight:bold; text-align:right;&quot;&gt;PK&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Amount&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Payment_Date&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Payment_Method&lt;/td&gt;&lt;td style=&quot;padding:4px;&quot;&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style=&quot;padding:4px;&quot;&gt;Bill_ID&lt;/td&gt;&lt;td style=&quot;padding:4px; color:#337ab7; font-weight:bold; text-align:right;&quot;&gt;FK&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="155" width="240" x="1350" y="960" as="geometry" />
+        </mxCell>
+        <mxCell id="fk_bill_app" edge="1" parent="1" source="t_bill" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_appointment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="994.79" y="774.03" />
+              <mxPoint x="994.79" y="774.03" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_lt_bill" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#888888;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1665" y="686" />
+              <mxPoint x="1800" y="686" />
+              <mxPoint x="1800" y="1014" />
+            </Array>
+            <mxPoint x="1665" y="646" as="sourcePoint" />
+            <mxPoint x="1130" y="1013.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="fk_pay_bill" edge="1" parent="1" source="t_payment" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#888888;" target="t_bill">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
