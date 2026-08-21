@@ -6,3 +6,5 @@ __pycache__/
 venv/
 env/
 .vscode/
+todo.md
+system_skeleton.md
