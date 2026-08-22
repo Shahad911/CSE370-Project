@@ -9,6 +9,7 @@
 </head>
 <body class="bg-light">
 
+    <!-- Top Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid px-4">
             <a class="navbar-brand fw-bold" href="/dashboard">
@@ -56,7 +57,126 @@
         </div>
 
         {% if user.Role == 'Admin' %}
-        <!-- ADMIN: Doctor Duty Schedules -->
+        <!-- ADMIN SECTION 1: Revenue Analytics & Financial Reports -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-dark text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Hospital Financial Analytics & Revenue Reports</h5>
+            </div>
+            <div class="card-body">
+                <!-- Summary Metric Badges -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-success bg-opacity-10 border border-success rounded text-center">
+                            <span class="text-muted small fw-bold text-uppercase">Total Hospital Revenue</span>
+                            <h2 class="text-success fw-bold my-1">{{ "%.2f"|format(revenue_summary.total_revenue) }} BDT</h2>
+                            <span class="badge bg-success">Live Aggregation</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-primary bg-opacity-10 border border-primary rounded text-center">
+                            <span class="text-muted small fw-bold text-uppercase">Total Processed Transactions</span>
+                            <h2 class="text-primary fw-bold my-1">{{ revenue_summary.total_transactions }}</h2>
+                            <span class="badge bg-primary">Completed Payments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Method Breakdown -->
+                    <div class="col-lg-6">
+                        <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-credit-card me-1"></i>Revenue by Payment Method</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Payment Channel</th>
+                                        <th>Transactions</th>
+                                        <th>Total Earnings (BDT)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rm in revenue_by_method %}
+                                    <tr>
+                                        <td><span class="badge bg-secondary">{{ rm.Payment_Method }}</span></td>
+                                        <td>{{ rm.transaction_count }}</td>
+                                        <td class="fw-bold text-success">{{ "%.2f"|format(rm.method_revenue) }} BDT</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">No payment transactions recorded.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Breakdown -->
+                    <div class="col-lg-6">
+                        <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-calendar-month me-1"></i>Monthly Revenue Trends</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Transactions</th>
+                                        <th>Monthly Revenue (BDT)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mr in monthly_revenue %}
+                                    <tr>
+                                        <td class="fw-bold">{{ mr.month_year }}</td>
+                                        <td>{{ mr.transaction_count }}</td>
+                                        <td class="fw-bold text-primary">{{ "%.2f"|format(mr.monthly_revenue) }} BDT</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">No monthly revenue data available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Payment Ledger -->
+                <h6 class="fw-bold mt-4 mb-3 text-dark"><i class="bi bi-receipt me-1"></i>Live Payment Transaction Ledger</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Payment ID</th>
+                                <th>Date</th>
+                                <th>Patient Name</th>
+                                <th>Invoice #</th>
+                                <th>Payment Channel</th>
+                                <th>Amount Received</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for py in payments %}
+                            <tr>
+                                <td>#{{ py.Payment_ID }}</td>
+                                <td>{{ py.Payment_Date }}</td>
+                                <td class="fw-semibold">{{ py.Patient_Name }}</td>
+                                <td>#{{ py.Bill_ID }}</td>
+                                <td><span class="badge bg-info text-dark">{{ py.Payment_Method }}</span></td>
+                                <td class="fw-bold text-success">{{ "%.2f"|format(py.Amount) }} BDT</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No payment transactions recorded in ledger.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADMIN SECTION 2: Doctor Duty Schedules -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Doctor Duty Schedules</h5>
@@ -146,7 +266,7 @@
             </div>
         </div>
 
-        <!-- ADMIN: Pharmacy Inventory -->
+        <!-- ADMIN SECTION 3: Pharmacy Inventory -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-success text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-capsule me-2"></i>Hospital Pharmacy Inventory</h5>
@@ -362,13 +482,15 @@
                             <h6 class="fw-bold mb-3 text-dark">Author Prescription</h6>
                             <form action="/doctor/prescription/create" method="POST">
                                 <div class="mb-2">
-                                    <label class="form-label small fw-bold">Select Appointment</label>
+                                    <label class="form-label small fw-bold">Select Consultation</label>
                                     <select name="appointment_id" class="form-select form-select-sm" required>
                                         <option value="">-- Choose Consultation --</option>
                                         {% for a in appointments %}
-                                            <option value="{{ a.Appointment_ID }}">
-                                                #{{ a.Appointment_ID }} - {{ a.Patient_Name }} ({{ a.Date }})
-                                            </option>
+                                            {% if not a.Prescription_ID %}
+                                                <option value="{{ a.Appointment_ID }}">
+                                                    #{{ a.Appointment_ID }} - {{ a.Patient_Name }} ({{ a.Date }})
+                                                </option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -537,7 +659,7 @@
                             <h6 class="fw-bold mb-3 text-dark">Generate Consultation Invoice</h6>
                             <form action="/doctor/bill/generate" method="POST">
                                 <div class="mb-2">
-                                    <label class="form-label small fw-bold">Select Appointment</label>
+                                    <label class="form-label small fw-bold">Select Consultation</label>
                                     <select name="appointment_id" class="form-select form-select-sm" required>
                                         <option value="">-- Choose Consultation --</option>
                                         {% for a in appointments %}
@@ -892,43 +1014,122 @@
             </div>
         </div>
 
-        <!-- PATIENT: My Invoices & Bills -->
+        <!-- PATIENT: Invoices & Payment Checkout -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-secondary text-white py-3">
-                <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>My Invoices & Billing</h5>
+                <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>Invoices & Payment Checkout</h5>
             </div>
             <div class="card-body">
+                <div class="row g-4">
+                    <!-- Pay Bill Form -->
+                    <div class="col-lg-4">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold mb-3 text-dark">Process Bill Payment</h6>
+                            <form action="/patient/payment/pay" method="POST">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Select Invoice</label>
+                                    <select name="bill_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose Unpaid Invoice --</option>
+                                        {% for b in bills %}
+                                            {% if b.Due_Amount > 0 %}
+                                                <option value="{{ b.Bill_ID }}">
+                                                    Invoice #{{ b.Bill_ID }} (Due: {{ "%.2f"|format(b.Due_Amount) }} BDT)
+                                                </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Payment Amount (BDT)</label>
+                                    <input type="number" step="0.01" name="amount" class="form-control form-control-sm" placeholder="0.00" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Payment Method</label>
+                                    <select name="payment_method" class="form-select form-select-sm" required>
+                                        <option value="Cash">Cash</option>
+                                        <option value="Mobile Banking">Mobile Banking (bKash/Nagad/Rocket)</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-sm w-100 fw-bold">
+                                    <i class="bi bi-credit-card me-1"></i>Pay Now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Invoices List -->
+                    <div class="col-lg-8">
+                        <h6 class="fw-bold mb-3 text-dark">My Invoices</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Invoice #</th>
+                                        <th>Date</th>
+                                        <th>Appt #</th>
+                                        <th>Total</th>
+                                        <th>Paid</th>
+                                        <th>Due</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for b in bills %}
+                                    <tr>
+                                        <td>#{{ b.Bill_ID }}</td>
+                                        <td>{{ b.Bill_Date }}</td>
+                                        <td>#{{ b.Appointment_ID }}</td>
+                                        <td class="fw-bold">{{ "%.2f"|format(b.Total_Amount) }}</td>
+                                        <td class="text-success">{{ "%.2f"|format(b.Paid_Amount) }}</td>
+                                        <td class="text-danger fw-bold">{{ "%.2f"|format(b.Due_Amount) }}</td>
+                                        <td>
+                                            {% if b.Due_Amount <= 0 and b.Total_Amount > 0 %}
+                                                <span class="badge bg-success">Paid in Full</span>
+                                            {% elif b.Paid_Amount > 0 %}
+                                                <span class="badge bg-warning text-dark">Partial</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Unpaid</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted">No invoices generated for your account.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Receipts History -->
+                <h6 class="fw-bold mt-4 mb-3 text-dark"><i class="bi bi-receipt-cutoff me-1"></i>My Payment Receipts History</h6>
                 <div class="table-responsive">
                     <table class="table table-hover table-bordered align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th>Invoice #</th>
+                                <th>Receipt #</th>
                                 <th>Date</th>
-                                <th>Consultation Appt #</th>
-                                <th>Total Payable</th>
-                                <th>Payment Status</th>
+                                <th>Invoice #</th>
+                                <th>Payment Method</th>
+                                <th>Amount Paid (BDT)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for b in bills %}
+                            {% for py in payments %}
                             <tr>
-                                <td>#{{ b.Bill_ID }}</td>
-                                <td>{{ b.Bill_Date }}</td>
-                                <td>#{{ b.Appointment_ID }}</td>
-                                <td class="fw-bold">{{ "%.2f"|format(b.Total_Amount) }} BDT</td>
-                                <td>
-                                    {% if b.Paid_Amount >= b.Total_Amount and b.Total_Amount > 0 %}
-                                        <span class="badge bg-success">Paid in Full</span>
-                                    {% elif b.Paid_Amount > 0 %}
-                                        <span class="badge bg-warning text-dark">Partial ({{ "%.2f"|format(b.Paid_Amount) }} BDT)</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">Unpaid</span>
-                                    {% endif %}
-                                </td>
+                                <td>#{{ py.Payment_ID }}</td>
+                                <td>{{ py.Payment_Date }}</td>
+                                <td>#{{ py.Bill_ID }}</td>
+                                <td><span class="badge bg-secondary">{{ py.Payment_Method }}</span></td>
+                                <td class="fw-bold text-success">{{ "%.2f"|format(py.Amount) }} BDT</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No invoices generated for your account.</td>
+                                <td colspan="5" class="text-center text-muted">No payment transactions recorded yet.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

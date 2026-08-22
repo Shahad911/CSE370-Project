@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_db_connection
+import datetime
 
 app = Flask(__name__)
 app.secret_key = "hospital_management_secret_key"
@@ -126,6 +127,10 @@ def dashboard():
     prescriptions = []
     lab_tests = []
     bills = []
+    payments = []
+    revenue_summary = {}
+    revenue_by_method = []
+    monthly_revenue = []
     patient_search = request.args.get("patient_search", "").strip()
     user_data = None
 
@@ -271,7 +276,9 @@ def dashboard():
         lab_tests = cursor.fetchall()
 
         cursor.execute("""
-            SELECT b.Bill_ID, b.Bill_Date, b.Total_Amount, b.Appointment_ID, COALESCE(SUM(py.Amount), 0) AS Paid_Amount 
+            SELECT b.Bill_ID, b.Bill_Date, b.Total_Amount, b.Appointment_ID, 
+                   COALESCE(SUM(py.Amount), 0) AS Paid_Amount,
+                   (b.Total_Amount - COALESCE(SUM(py.Amount), 0)) AS Due_Amount
             FROM Bill b 
             JOIN Appointment a ON b.Appointment_ID = a.Appointment_ID 
             LEFT JOIN Payment py ON b.Bill_ID = py.Bill_ID 
@@ -280,6 +287,16 @@ def dashboard():
             ORDER BY b.Bill_ID DESC
         """, (user_id,))
         bills = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT py.Payment_ID, py.Amount, py.Payment_Date, py.Payment_Method, py.Bill_ID 
+            FROM Payment py 
+            JOIN Bill b ON py.Bill_ID = b.Bill_ID 
+            JOIN Appointment a ON b.Appointment_ID = a.Appointment_ID 
+            WHERE a.Patient_ID = %s 
+            ORDER BY py.Payment_Date DESC, py.Payment_ID DESC
+        """, (user_id,))
+        payments = cursor.fetchall()
 
     else:  # Admin
         query = "SELECT User_ID, Name, Email, Phone FROM User WHERE User_ID = %s"
@@ -305,6 +322,40 @@ def dashboard():
         cursor.execute("SELECT * FROM Medicine ORDER BY Name ASC")
         medicines = cursor.fetchall()
 
+        # Admin Revenue Reports & Analytics (Feature 7)
+        cursor.execute("""
+            SELECT COALESCE(SUM(Amount), 0) AS total_revenue, COUNT(Payment_ID) AS total_transactions 
+            FROM Payment
+        """)
+        revenue_summary = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT Payment_Method, SUM(Amount) AS method_revenue, COUNT(Payment_ID) AS transaction_count 
+            FROM Payment 
+            GROUP BY Payment_Method 
+            ORDER BY method_revenue DESC
+        """)
+        revenue_by_method = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT DATE_FORMAT(Payment_Date, '%Y-%m') AS month_year, SUM(Amount) AS monthly_revenue, COUNT(Payment_ID) AS transaction_count 
+            FROM Payment 
+            GROUP BY month_year 
+            ORDER BY month_year DESC
+        """)
+        monthly_revenue = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT py.Payment_ID, py.Amount, py.Payment_Date, py.Payment_Method, py.Bill_ID, u.Name AS Patient_Name 
+            FROM Payment py 
+            JOIN Bill b ON py.Bill_ID = b.Bill_ID 
+            JOIN Appointment a ON b.Appointment_ID = a.Appointment_ID 
+            JOIN Patient p ON a.Patient_ID = p.Patient_ID 
+            JOIN User u ON p.Patient_ID = u.User_ID 
+            ORDER BY py.Payment_Date DESC, py.Payment_ID DESC
+        """)
+        payments = cursor.fetchall()
+
     if user_data:
         user_data["Role"] = role
 
@@ -323,6 +374,10 @@ def dashboard():
         prescriptions=prescriptions,
         lab_tests=lab_tests,
         bills=bills,
+        payments=payments,
+        revenue_summary=revenue_summary,
+        revenue_by_method=revenue_by_method,
+        monthly_revenue=monthly_revenue,
         patient_search=patient_search
     )
 
@@ -445,6 +500,30 @@ def patient_cancel_appointment(appointment_id):
         cursor = conn.cursor()
         query = "UPDATE Appointment SET Status = 'Cancelled' WHERE Appointment_ID = %s AND Patient_ID = %s"
         cursor.execute(query, (appointment_id, patient_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/patient/payment/pay", methods=["POST"])
+def patient_make_payment():
+    if session.get("role") != "Patient":
+        return redirect(url_for("login"))
+
+    bill_id = request.form.get("bill_id")
+    amount = request.form.get("amount")
+    payment_method = request.form.get("payment_method")
+    payment_date = request.form.get("payment_date") or str(datetime.date.today())
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Payment (Amount, Payment_Date, Payment_Method, Bill_ID) 
+            VALUES (%s, %s, %s, %s)
+        """
+        cursor.execute(query, (amount, payment_date, payment_method, bill_id))
         conn.commit()
         cursor.close()
         conn.close()
