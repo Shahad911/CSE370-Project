@@ -32,6 +32,7 @@
 
     <div class="container py-4">
 
+        <!-- User Profile Card -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-white py-3">
                 <h5 class="mb-0 text-primary"><i class="bi bi-person-badge me-2"></i>My Profile</h5>
@@ -55,6 +56,7 @@
         </div>
 
         {% if user.Role == 'Admin' %}
+        <!-- ADMIN: Doctor Duty Schedules -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Doctor Duty Schedules</h5>
@@ -144,6 +146,7 @@
             </div>
         </div>
 
+        <!-- ADMIN: Pharmacy Inventory -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-success text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-capsule me-2"></i>Hospital Pharmacy Inventory</h5>
@@ -223,6 +226,7 @@
         {% endif %}
 
         {% if user.Role == 'Doctor' %}
+        <!-- DOCTOR: Patient Directory & Search -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-people me-2"></i>Patient Directory & Search</h5>
@@ -276,6 +280,7 @@
             </div>
         </div>
 
+        <!-- DOCTOR: Consultations & Appointments -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-success text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-clipboard-pulse me-2"></i>My Consultations & Appointments</h5>
@@ -286,11 +291,11 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Appointment ID</th>
-                                <th>Date</th>
-                                <th>Time</th>
+                                <th>Date & Time</th>
                                 <th>Patient Name</th>
-                                <th>Contact Phone</th>
+                                <th>Phone</th>
                                 <th>Status</th>
+                                <th>Prescription / Bill</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -298,8 +303,7 @@
                             {% for a in appointments %}
                             <tr>
                                 <td>#{{ a.Appointment_ID }}</td>
-                                <td>{{ a.Date }}</td>
-                                <td>{{ a.Time }}</td>
+                                <td>{{ a.Date }} ({{ a.Time }})</td>
                                 <td class="fw-semibold">{{ a.Patient_Name }}</td>
                                 <td>{{ a.Patient_Phone }}</td>
                                 <td>
@@ -312,14 +316,26 @@
                                     {% endif %}
                                 </td>
                                 <td>
+                                    {% if a.Prescription_ID %}
+                                        <span class="badge bg-info text-dark">Prescribed (#{{ a.Prescription_ID }})</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">No Rx</span>
+                                    {% endif %}
+                                    {% if a.Bill_ID %}
+                                        <span class="badge bg-success">Billed (#{{ a.Bill_ID }})</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">No Bill</span>
+                                    {% endif %}
+                                </td>
+                                <td>
                                     {% if a.Status == 'Scheduled' %}
                                         <form action="/doctor/appointment/complete/{{ a.Appointment_ID }}" method="POST" style="display:inline;">
-                                            <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <button type="submit" class="btn btn-outline-success btn-sm py-0">
                                                 <i class="bi bi-check-lg me-1"></i>Mark Completed
                                             </button>
                                         </form>
                                     {% else %}
-                                        <span class="text-muted small">No action</span>
+                                        <span class="text-muted small">Done</span>
                                     {% endif %}
                                 </td>
                             </tr>
@@ -334,6 +350,256 @@
             </div>
         </div>
 
+        <!-- DOCTOR: Issue Prescription -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-info text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-prescription2 me-2"></i>Issue Medication Prescription</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold mb-3 text-dark">Author Prescription</h6>
+                            <form action="/doctor/prescription/create" method="POST">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Select Appointment</label>
+                                    <select name="appointment_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose Consultation --</option>
+                                        {% for a in appointments %}
+                                            <option value="{{ a.Appointment_ID }}">
+                                                #{{ a.Appointment_ID }} - {{ a.Patient_Name }} ({{ a.Date }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Prescription Date</label>
+                                    <input type="date" name="date" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Select Medicine</label>
+                                    <select name="medicine_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose Medicine --</option>
+                                        {% for m in medicines %}
+                                            <option value="{{ m.Medicine_ID }}">
+                                                {{ m.Name }} ({{ "%.2f"|format(m.Price) }} BDT - Stock: {{ m.Stock }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Dosage</label>
+                                    <input type="text" name="dosage" class="form-control form-control-sm" placeholder="e.g. 500mg, 1 tablet" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Frequency</label>
+                                    <input type="text" name="frequency" class="form-control form-control-sm" placeholder="e.g. 1+0+1 after meals" required>
+                                </div>
+                                <button type="submit" class="btn btn-info text-white btn-sm w-100 fw-bold">
+                                    <i class="bi bi-plus-circle me-1"></i>Issue Prescription
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <h6 class="fw-bold mb-3 text-dark">Issued Prescriptions</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Appt #</th>
+                                        <th>Patient</th>
+                                        <th>Medicine</th>
+                                        <th>Dosage</th>
+                                        <th>Frequency</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pr in prescriptions %}
+                                    <tr>
+                                        <td>{{ pr.Date }}</td>
+                                        <td>#{{ pr.Appointment_ID }}</td>
+                                        <td class="fw-semibold">{{ pr.Patient_Name }}</td>
+                                        <td><strong>{{ pr.Medicine_Name }}</strong></td>
+                                        <td>{{ pr.Dosage }}</td>
+                                        <td>{{ pr.Frequency }}</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No prescriptions issued yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCTOR: Lab Tests & Diagnostics -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0"><i class="bi bi-eyedropper me-2"></i>Lab Tests & Diagnostics</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold mb-3 text-dark">Order Lab Test</h6>
+                            <form action="/doctor/lab-test/order" method="POST">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Select Patient</label>
+                                    <select name="patient_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose Patient --</option>
+                                        {% for p in patients %}
+                                            <option value="{{ p.Patient_ID }}">{{ p.Name }} (Phone: {{ p.Phone }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Test Name</label>
+                                    <input type="text" name="test_name" class="form-control form-control-sm" placeholder="e.g., Complete Blood Count (CBC)" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Test Cost (BDT)</label>
+                                    <input type="number" step="0.01" name="test_cost" class="form-control form-control-sm" placeholder="e.g., 800.00" required>
+                                </div>
+                                <button type="submit" class="btn btn-warning btn-sm w-100 fw-bold">
+                                    <i class="bi bi-plus-circle me-1"></i>Order Diagnostic Test
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <h6 class="fw-bold mb-3 text-dark">Diagnostic Orders & Results</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Test Name</th>
+                                        <th>Cost</th>
+                                        <th>Status</th>
+                                        <th>Result / Update</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for lt in lab_tests %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ lt.Patient_Name }}</td>
+                                        <td>{{ lt.Test_Name }}</td>
+                                        <td>{{ "%.2f"|format(lt.Test_Cost) }} BDT</td>
+                                        <td>
+                                            {% if lt.Status == 'Completed' %}
+                                                <span class="badge bg-success">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if lt.Status == 'Completed' %}
+                                                <span class="text-success small fw-bold">{{ lt.Result }}</span>
+                                            {% else %}
+                                                <form action="/doctor/lab-test/update" method="POST" class="d-flex gap-1">
+                                                    <input type="hidden" name="test_id" value="{{ lt.Test_ID }}">
+                                                    <input type="text" name="result" placeholder="Enter findings..." class="form-control form-control-sm" required>
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No lab tests ordered yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCTOR: Bill Generation -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-secondary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-receipt me-2"></i>Consultation Invoicing & Bill Generation</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="p-3 border rounded bg-light">
+                            <h6 class="fw-bold mb-3 text-dark">Generate Consultation Invoice</h6>
+                            <form action="/doctor/bill/generate" method="POST">
+                                <div class="mb-2">
+                                    <label class="form-label small fw-bold">Select Appointment</label>
+                                    <select name="appointment_id" class="form-select form-select-sm" required>
+                                        <option value="">-- Choose Consultation --</option>
+                                        {% for a in appointments %}
+                                            {% if not a.Bill_ID %}
+                                                <option value="{{ a.Appointment_ID }}">
+                                                    #{{ a.Appointment_ID }} - {{ a.Patient_Name }} ({{ a.Date }})
+                                                </option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Bill Date</label>
+                                    <input type="date" name="bill_date" class="form-control form-control-sm" required>
+                                </div>
+                                <div class="p-2 mb-3 bg-white border rounded small text-muted">
+                                    <strong>Auto-Calculation Formula:</strong><br>
+                                    Base Consultation Fee (500 BDT) + Prescribed Medicines + Unbilled Lab Tests.
+                                </div>
+                                <button type="submit" class="btn btn-secondary btn-sm w-100 fw-bold">
+                                    <i class="bi bi-receipt-cutoff me-1"></i>Generate Bill
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <h6 class="fw-bold mb-3 text-dark">Generated Patient Invoices</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Bill #</th>
+                                        <th>Date</th>
+                                        <th>Patient</th>
+                                        <th>Appt #</th>
+                                        <th>Total Amount (BDT)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for b in bills %}
+                                    <tr>
+                                        <td>#{{ b.Bill_ID }}</td>
+                                        <td>{{ b.Bill_Date }}</td>
+                                        <td class="fw-semibold">{{ b.Patient_Name }}</td>
+                                        <td>#{{ b.Appointment_ID }}</td>
+                                        <td class="fw-bold text-success">{{ "%.2f"|format(b.Total_Amount) }} BDT</td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">No invoices generated yet.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCTOR: Medical History Records -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-dark text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-journal-medical me-2"></i>Patient Medical History Records</h5>
@@ -409,6 +675,7 @@
         {% endif %}
 
         {% if user.Role == 'Patient' %}
+        <!-- PATIENT: Book Consultation -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-info text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Book Doctor Appointment</h5>
@@ -480,6 +747,7 @@
             </div>
         </div>
 
+        <!-- PATIENT: My Appointments -->
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-header bg-dark text-white py-3">
                 <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>My Consultations & Appointments</h5>
@@ -528,6 +796,139 @@
                             {% else %}
                             <tr>
                                 <td colspan="7" class="text-center text-muted">You have no booked appointments yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATIENT: My Prescriptions -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-success text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-prescription me-2"></i>My Prescribed Medications</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Doctor</th>
+                                <th>Specialization</th>
+                                <th>Medicine</th>
+                                <th>Dosage</th>
+                                <th>Frequency</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pr in prescriptions %}
+                            <tr>
+                                <td>{{ pr.Date }}</td>
+                                <td class="fw-semibold">{{ pr.Doctor_Name }}</td>
+                                <td><span class="badge bg-secondary">{{ pr.Specialization }}</span></td>
+                                <td><strong>{{ pr.Medicine_Name }}</strong></td>
+                                <td>{{ pr.Dosage }}</td>
+                                <td>{{ pr.Frequency }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No prescriptions issued for your account.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATIENT: My Lab Test Reports -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-warning text-dark py-3">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-medical me-2"></i>My Diagnostic Reports</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Prescribing Doctor</th>
+                                <th>Cost</th>
+                                <th>Status</th>
+                                <th>Diagnostic Findings / Report</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lt in lab_tests %}
+                            <tr>
+                                <td class="fw-semibold">{{ lt.Test_Name }}</td>
+                                <td>{{ lt.Doctor_Name }}</td>
+                                <td>{{ "%.2f"|format(lt.Test_Cost) }} BDT</td>
+                                <td>
+                                    {% if lt.Status == 'Completed' %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if lt.Result %}
+                                        <span class="text-success fw-bold">{{ lt.Result }}</span>
+                                    {% else %}
+                                        <span class="text-muted small italic">Awaiting laboratory analysis...</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No diagnostic tests ordered.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PATIENT: My Invoices & Bills -->
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-header bg-secondary text-white py-3">
+                <h5 class="mb-0"><i class="bi bi-wallet2 me-2"></i>My Invoices & Billing</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Date</th>
+                                <th>Consultation Appt #</th>
+                                <th>Total Payable</th>
+                                <th>Payment Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for b in bills %}
+                            <tr>
+                                <td>#{{ b.Bill_ID }}</td>
+                                <td>{{ b.Bill_Date }}</td>
+                                <td>#{{ b.Appointment_ID }}</td>
+                                <td class="fw-bold">{{ "%.2f"|format(b.Total_Amount) }} BDT</td>
+                                <td>
+                                    {% if b.Paid_Amount >= b.Total_Amount and b.Total_Amount > 0 %}
+                                        <span class="badge bg-success">Paid in Full</span>
+                                    {% elif b.Paid_Amount > 0 %}
+                                        <span class="badge bg-warning text-dark">Partial ({{ "%.2f"|format(b.Paid_Amount) }} BDT)</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Unpaid</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No invoices generated for your account.</td>
                             </tr>
                             {% endfor %}
                         </tbody>

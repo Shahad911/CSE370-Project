@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_db_connection
 
 app = Flask(__name__)
@@ -123,6 +123,9 @@ def dashboard():
     appointments = []
     patients = []
     medical_histories = []
+    prescriptions = []
+    lab_tests = []
+    bills = []
     patient_search = request.args.get("patient_search", "").strip()
     user_data = None
 
@@ -137,10 +140,13 @@ def dashboard():
         user_data = cursor.fetchone()
 
         cursor.execute("""
-            SELECT a.Appointment_ID, a.Date, a.Time, a.Status, a.Patient_ID, u.Name AS Patient_Name, u.Phone AS Patient_Phone 
+            SELECT a.Appointment_ID, a.Date, a.Time, a.Status, a.Patient_ID, u.Name AS Patient_Name, u.Phone AS Patient_Phone,
+                   b.Bill_ID, pr.Prescription_ID
             FROM Appointment a 
             JOIN Patient p ON a.Patient_ID = p.Patient_ID 
             JOIN User u ON p.Patient_ID = u.User_ID 
+            LEFT JOIN Bill b ON a.Appointment_ID = b.Appointment_ID
+            LEFT JOIN Prescription pr ON a.Appointment_ID = pr.Appointment_ID
             WHERE a.Doctor_ID = %s 
             ORDER BY a.Date DESC, a.Time DESC
         """, (user_id,))
@@ -175,6 +181,43 @@ def dashboard():
         """)
         medical_histories = cursor.fetchall()
 
+        cursor.execute("""
+            SELECT pr.Prescription_ID, pr.Date, a.Appointment_ID, pu.Name AS Patient_Name, m.Name AS Medicine_Name, pm.Dosage, pm.Frequency, m.Price 
+            FROM Prescription pr 
+            JOIN Appointment a ON pr.Appointment_ID = a.Appointment_ID 
+            JOIN Patient pt ON a.Patient_ID = pt.Patient_ID 
+            JOIN User pu ON pt.Patient_ID = pu.User_ID 
+            JOIN Prescription_Medicine pm ON pr.Prescription_ID = pm.Prescription_ID 
+            JOIN Medicine m ON pm.Medicine_ID = m.Medicine_ID 
+            WHERE a.Doctor_ID = %s 
+            ORDER BY pr.Date DESC, pr.Prescription_ID DESC
+        """, (user_id,))
+        prescriptions = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT lt.Test_ID, lt.Test_Name, lt.Test_Cost, lt.Status, lt.Result, u.Name AS Patient_Name 
+            FROM Lab_Test lt 
+            JOIN Patient p ON lt.Patient_ID = p.Patient_ID 
+            JOIN User u ON p.Patient_ID = u.User_ID 
+            WHERE lt.Doctor_ID = %s 
+            ORDER BY lt.Test_ID DESC
+        """, (user_id,))
+        lab_tests = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT b.Bill_ID, b.Bill_Date, b.Total_Amount, b.Appointment_ID, u.Name AS Patient_Name 
+            FROM Bill b 
+            JOIN Appointment a ON b.Appointment_ID = a.Appointment_ID 
+            JOIN Patient p ON a.Patient_ID = p.Patient_ID 
+            JOIN User u ON p.Patient_ID = u.User_ID 
+            WHERE a.Doctor_ID = %s 
+            ORDER BY b.Bill_ID DESC
+        """, (user_id,))
+        bills = cursor.fetchall()
+
+        cursor.execute("SELECT * FROM Medicine ORDER BY Name ASC")
+        medicines = cursor.fetchall()
+
     elif role == "Patient":
         query = """
             SELECT u.User_ID, u.Name, u.Email, u.Phone, p.DOB, p.Gender 
@@ -203,6 +246,40 @@ def dashboard():
             ORDER BY a.Date DESC, a.Time DESC
         """, (user_id,))
         appointments = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT pr.Prescription_ID, pr.Date, du.Name AS Doctor_Name, d.Specialization, m.Name AS Medicine_Name, pm.Dosage, pm.Frequency 
+            FROM Prescription pr 
+            JOIN Appointment a ON pr.Appointment_ID = a.Appointment_ID 
+            JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID 
+            JOIN User du ON d.Doctor_ID = du.User_ID 
+            JOIN Prescription_Medicine pm ON pr.Prescription_ID = pm.Prescription_ID 
+            JOIN Medicine m ON pm.Medicine_ID = m.Medicine_ID 
+            WHERE a.Patient_ID = %s 
+            ORDER BY pr.Date DESC
+        """, (user_id,))
+        prescriptions = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT lt.Test_ID, lt.Test_Name, lt.Test_Cost, lt.Status, lt.Result, du.Name AS Doctor_Name 
+            FROM Lab_Test lt 
+            JOIN Doctor d ON lt.Doctor_ID = d.Doctor_ID 
+            JOIN User du ON d.Doctor_ID = du.User_ID 
+            WHERE lt.Patient_ID = %s 
+            ORDER BY lt.Test_ID DESC
+        """, (user_id,))
+        lab_tests = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT b.Bill_ID, b.Bill_Date, b.Total_Amount, b.Appointment_ID, COALESCE(SUM(py.Amount), 0) AS Paid_Amount 
+            FROM Bill b 
+            JOIN Appointment a ON b.Appointment_ID = a.Appointment_ID 
+            LEFT JOIN Payment py ON b.Bill_ID = py.Bill_ID 
+            WHERE a.Patient_ID = %s 
+            GROUP BY b.Bill_ID, b.Bill_Date, b.Total_Amount, b.Appointment_ID 
+            ORDER BY b.Bill_ID DESC
+        """, (user_id,))
+        bills = cursor.fetchall()
 
     else:  # Admin
         query = "SELECT User_ID, Name, Email, Phone FROM User WHERE User_ID = %s"
@@ -243,6 +320,9 @@ def dashboard():
         appointments=appointments,
         patients=patients,
         medical_histories=medical_histories,
+        prescriptions=prescriptions,
+        lab_tests=lab_tests,
+        bills=bills,
         patient_search=patient_search
     )
 
@@ -408,6 +488,129 @@ def doctor_complete_appointment(appointment_id):
         cursor = conn.cursor()
         query = "UPDATE Appointment SET Status = 'Completed' WHERE Appointment_ID = %s AND Doctor_ID = %s"
         cursor.execute(query, (appointment_id, doctor_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/prescription/create", methods=["POST"])
+def doctor_create_prescription():
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    appointment_id = request.form.get("appointment_id")
+    date = request.form.get("date")
+    medicine_id = request.form.get("medicine_id")
+    dosage = request.form.get("dosage")
+    frequency = request.form.get("frequency")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO Prescription (Date, Appointment_ID) VALUES (%s, %s)", (date, appointment_id))
+        prescription_id = cursor.lastrowid
+        cursor.execute("""
+            INSERT INTO Prescription_Medicine (Prescription_ID, Medicine_ID, Dosage, Frequency) 
+            VALUES (%s, %s, %s, %s)
+        """, (prescription_id, medicine_id, dosage, frequency))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/lab-test/order", methods=["POST"])
+def doctor_order_lab_test():
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    doctor_id = session.get("user_id")
+    patient_id = request.form.get("patient_id")
+    test_name = request.form.get("test_name")
+    test_cost = request.form.get("test_cost")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Lab_Test (Test_Name, Test_Cost, Status, Result, Patient_ID, Doctor_ID, Bill_ID) 
+            VALUES (%s, %s, 'Pending', NULL, %s, %s, NULL)
+        """
+        cursor.execute(query, (test_name, test_cost, patient_id, doctor_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/lab-test/update", methods=["POST"])
+def doctor_update_lab_test():
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    test_id = request.form.get("test_id")
+    result = request.form.get("result")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = "UPDATE Lab_Test SET Result = %s, Status = 'Completed' WHERE Test_ID = %s"
+        cursor.execute(query, (result, test_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/bill/generate", methods=["POST"])
+def doctor_generate_bill():
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    appointment_id = request.form.get("appointment_id")
+    bill_date = request.form.get("bill_date")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        total_amount = 500.00  # Base Consultation Fee
+
+        cursor.execute("""
+            SELECT SUM(m.Price) AS med_total 
+            FROM Prescription pr 
+            JOIN Prescription_Medicine pm ON pr.Prescription_ID = pm.Prescription_ID 
+            JOIN Medicine m ON pm.Medicine_ID = m.Medicine_ID 
+            WHERE pr.Appointment_ID = %s
+        """, (appointment_id,))
+        med_row = cursor.fetchone()
+        if med_row and med_row["med_total"]:
+            total_amount += float(med_row["med_total"])
+
+        cursor.execute("SELECT Patient_ID, Doctor_ID FROM Appointment WHERE Appointment_ID = %s", (appointment_id,))
+        appt = cursor.fetchone()
+        if appt:
+            patient_id = appt["Patient_ID"]
+            doctor_id = appt["Doctor_ID"]
+
+            cursor.execute("""
+                SELECT Test_ID, Test_Cost 
+                FROM Lab_Test 
+                WHERE Patient_ID = %s AND Doctor_ID = %s AND Bill_ID IS NULL
+            """, (patient_id, doctor_id))
+            tests = cursor.fetchall()
+            for t in tests:
+                total_amount += float(t["Test_Cost"])
+
+            cursor.execute("""
+                INSERT INTO Bill (Bill_Date, Total_Amount, Appointment_ID) 
+                VALUES (%s, %s, %s)
+            """, (bill_date, total_amount, appointment_id))
+            bill_id = cursor.lastrowid
+
+            for t in tests:
+                cursor.execute("UPDATE Lab_Test SET Bill_ID = %s WHERE Test_ID = %s", (bill_id, t["Test_ID"]))
+
         conn.commit()
         cursor.close()
         conn.close()
