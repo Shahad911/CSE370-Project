@@ -1,4 +1,4 @@
-﻿USE hospital_db;
+USE hospital_db;
 
 -- 1. Insert Base Users
 INSERT INTO User (User_ID, Name, Email, Password, Phone) VALUES

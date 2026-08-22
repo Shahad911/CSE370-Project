@@ -1,4 +1,4 @@
-﻿from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_db_connection
 
 app = Flask(__name__)
@@ -120,6 +120,7 @@ def dashboard():
     schedules = []
     doctors = []
     medicines = []
+    appointments = []
     user_data = None
 
     if role == "Doctor":
@@ -141,6 +142,25 @@ def dashboard():
         """
         cursor.execute(query, (user_id,))
         user_data = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT s.Schedule_ID, s.Day, s.Start_Time, s.End_Time, s.Doctor_ID, u.Name AS Doctor_Name, d.Specialization 
+            FROM Schedule s 
+            JOIN Doctor d ON s.Doctor_ID = d.Doctor_ID 
+            JOIN User u ON d.Doctor_ID = u.User_ID 
+            ORDER BY FIELD(s.Day, 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday')
+        """)
+        schedules = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT a.Appointment_ID, a.Date, a.Time, a.Status, u.Name AS Doctor_Name, d.Specialization 
+            FROM Appointment a 
+            JOIN Doctor d ON a.Doctor_ID = d.Doctor_ID 
+            JOIN User u ON d.Doctor_ID = u.User_ID 
+            WHERE a.Patient_ID = %s 
+            ORDER BY a.Date DESC, a.Time DESC
+        """, (user_id,))
+        appointments = cursor.fetchall()
 
     else:  # Admin
         query = "SELECT User_ID, Name, Email, Phone FROM User WHERE User_ID = %s"
@@ -172,7 +192,7 @@ def dashboard():
     cursor.close()
     conn.close()
 
-    return render_template("dashboard.html", user=user_data, schedules=schedules, doctors=doctors, medicines=medicines)
+    return render_template("dashboard.html", user=user_data, schedules=schedules, doctors=doctors, medicines=medicines, appointments=appointments)
 
 @app.route("/admin/schedule/add", methods=["POST"])
 def admin_add_schedule():
@@ -245,6 +265,54 @@ def admin_update_medicine():
         cursor = conn.cursor()
         query = "UPDATE Medicine SET Price = %s, Stock = %s WHERE Medicine_ID = %s"
         cursor.execute(query, (price, stock, medicine_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/patient/appointment/book", methods=["POST"])
+def patient_book_appointment():
+    if session.get("role") != "Patient":
+        return redirect(url_for("login"))
+
+    patient_id = session.get("user_id")
+    schedule_id = request.form.get("schedule_id")
+    date = request.form.get("date")
+    time = request.form.get("time")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT Doctor_ID FROM Schedule WHERE Schedule_ID = %s", (schedule_id,))
+        sched = cursor.fetchone()
+
+        if sched:
+            doctor_id = sched["Doctor_ID"]
+            query = """
+                INSERT INTO Appointment (Date, Time, Status, Patient_ID, Doctor_ID, Schedule_ID) 
+                VALUES (%s, %s, 'Scheduled', %s, %s, %s)
+            """
+            cursor.execute(query, (date, time, patient_id, doctor_id, schedule_id))
+            conn.commit()
+
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/patient/appointment/cancel/<int:appointment_id>", methods=["POST"])
+def patient_cancel_appointment(appointment_id):
+    if session.get("role") != "Patient":
+        return redirect(url_for("login"))
+
+    patient_id = session.get("user_id")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = "UPDATE Appointment SET Status = 'Cancelled' WHERE Appointment_ID = %s AND Patient_ID = %s"
+        cursor.execute(query, (appointment_id, patient_id))
         conn.commit()
         cursor.close()
         conn.close()
