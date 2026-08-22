@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+﻿from flask import Flask, render_template, request, redirect, url_for, session
 from db import get_db_connection
 
 app = Flask(__name__)
@@ -121,6 +121,9 @@ def dashboard():
     doctors = []
     medicines = []
     appointments = []
+    patients = []
+    medical_histories = []
+    patient_search = request.args.get("patient_search", "").strip()
     user_data = None
 
     if role == "Doctor":
@@ -132,6 +135,45 @@ def dashboard():
         """
         cursor.execute(query, (user_id,))
         user_data = cursor.fetchone()
+
+        cursor.execute("""
+            SELECT a.Appointment_ID, a.Date, a.Time, a.Status, a.Patient_ID, u.Name AS Patient_Name, u.Phone AS Patient_Phone 
+            FROM Appointment a 
+            JOIN Patient p ON a.Patient_ID = p.Patient_ID 
+            JOIN User u ON p.Patient_ID = u.User_ID 
+            WHERE a.Doctor_ID = %s 
+            ORDER BY a.Date DESC, a.Time DESC
+        """, (user_id,))
+        appointments = cursor.fetchall()
+
+        if patient_search:
+            search_pattern = f"%{patient_search}%"
+            cursor.execute("""
+                SELECT p.Patient_ID, u.Name, u.Email, u.Phone, p.DOB, p.Gender 
+                FROM Patient p 
+                JOIN User u ON p.Patient_ID = u.User_ID 
+                WHERE u.Name LIKE %s OR u.Phone LIKE %s 
+                ORDER BY u.Name ASC
+            """, (search_pattern, search_pattern))
+        else:
+            cursor.execute("""
+                SELECT p.Patient_ID, u.Name, u.Email, u.Phone, p.DOB, p.Gender 
+                FROM Patient p 
+                JOIN User u ON p.Patient_ID = u.User_ID 
+                ORDER BY u.Name ASC
+            """)
+        patients = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT m.Record_ID, m.Diagnosis, m.Treatment, m.Date, u.Name AS Patient_Name, du.Name AS Doctor_Name 
+            FROM Medical_History m 
+            JOIN Patient p ON m.Patient_ID = p.Patient_ID 
+            JOIN User u ON p.Patient_ID = u.User_ID 
+            JOIN Doctor d ON m.Doctor_ID = d.Doctor_ID 
+            JOIN User du ON d.Doctor_ID = du.User_ID 
+            ORDER BY m.Date DESC, m.Record_ID DESC
+        """)
+        medical_histories = cursor.fetchall()
 
     elif role == "Patient":
         query = """
@@ -192,7 +234,17 @@ def dashboard():
     cursor.close()
     conn.close()
 
-    return render_template("dashboard.html", user=user_data, schedules=schedules, doctors=doctors, medicines=medicines, appointments=appointments)
+    return render_template(
+        "dashboard.html",
+        user=user_data,
+        schedules=schedules,
+        doctors=doctors,
+        medicines=medicines,
+        appointments=appointments,
+        patients=patients,
+        medical_histories=medical_histories,
+        patient_search=patient_search
+    )
 
 @app.route("/admin/schedule/add", methods=["POST"])
 def admin_add_schedule():
@@ -313,6 +365,49 @@ def patient_cancel_appointment(appointment_id):
         cursor = conn.cursor()
         query = "UPDATE Appointment SET Status = 'Cancelled' WHERE Appointment_ID = %s AND Patient_ID = %s"
         cursor.execute(query, (appointment_id, patient_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/medical-history/add", methods=["POST"])
+def doctor_add_medical_history():
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    doctor_id = session.get("user_id")
+    patient_id = request.form.get("patient_id")
+    diagnosis = request.form.get("diagnosis")
+    treatment = request.form.get("treatment")
+    date = request.form.get("date")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO Medical_History (Diagnosis, Treatment, Date, Patient_ID, Doctor_ID) 
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (diagnosis, treatment, date, patient_id, doctor_id))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+    return redirect(url_for("dashboard"))
+
+@app.route("/doctor/appointment/complete/<int:appointment_id>", methods=["POST"])
+def doctor_complete_appointment(appointment_id):
+    if session.get("role") != "Doctor":
+        return redirect(url_for("login"))
+
+    doctor_id = session.get("user_id")
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        query = "UPDATE Appointment SET Status = 'Completed' WHERE Appointment_ID = %s AND Doctor_ID = %s"
+        cursor.execute(query, (appointment_id, doctor_id))
         conn.commit()
         cursor.close()
         conn.close()
